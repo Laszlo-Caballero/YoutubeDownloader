@@ -1,3 +1,5 @@
+using YoutubeDownloader.ModalDownload;
+
 namespace YoutubeDownloader
 {
     public partial class Form1 : Form
@@ -11,7 +13,7 @@ namespace YoutubeDownloader
 
         private void txtLink_TextChanged(object sender, EventArgs e)
         {
-            if (txtLink.Text.Contains("www.youtube.com/watch"))
+            if (txtLink.Text.Contains("www.youtube.com/watch") || txtLink.Text.Contains("www.youtube.com/playlist"))
             {
                 btnDownload.Enabled = true;
             }
@@ -19,23 +21,11 @@ namespace YoutubeDownloader
 
         private async void btnDownload_Click(object sender, EventArgs e)
         {
-            string tipo = opciones.Text;
-            string url = txtLink.Text;
-            switch (tipo)
-            {
-                case "Audio":
-                  await  descargar.DownloadAudio(url);
-                    MessageBox.Show("Descarga finalizada");
-                break;
-                case "Video":
-                    await descargar.DownloadVideo(url);
-                    MessageBox.Show("Descarga finalizada");
-                    break;
-                case "Playlist":
-                    await descargar.DowloadPlaylist(url);
-                    MessageBox.Show("Descarga finalizada");
-                    break;
-            }
+            string link = txtLink.Text;
+            txtLink.Text = "";
+            Modal modal = new Modal(opciones.Text, link, this);
+            
+            modal.Show();
         }
     }
 }
