@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using YoutubeDownloader;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 
 
-namespace YoutubeDownloader
+namespace YoutubeDownloader.YoutubeDownloader
 {
     internal class Downloader
     {
@@ -37,8 +36,8 @@ namespace YoutubeDownloader
             });
             await youtube.Videos.Streams.DownloadAsync(streamInfo, outputPath, progressHandler);
         }
-        public async Task DownloadAudio(string videoUrl, ProgressBar progreso )
-        { 
+        public async Task DownloadAudio(string videoUrl, ProgressBar progreso)
+        {
             var video = await youtube.Videos.GetAsync(videoUrl);
             var streamManifest = await youtube.Videos.Streams.GetManifestAsync(videoUrl);
             var streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
@@ -60,7 +59,7 @@ namespace YoutubeDownloader
         }
         public async Task DowloadPlaylist(string playlisturl, ProgressBar progreso)
         {
-           await foreach(var videos in youtube.Playlists.GetVideosAsync(playlisturl))
+            await foreach (var videos in youtube.Playlists.GetVideosAsync(playlisturl))
             {
                 await DownloadAudio(videos.Url, progreso);
             }

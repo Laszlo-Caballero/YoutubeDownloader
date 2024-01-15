@@ -9,10 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="YoutubeDownloader\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="YoutubeExplode" Version="6.3.11" />
   </ItemGroup>
 
