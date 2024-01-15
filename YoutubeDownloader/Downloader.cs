@@ -14,7 +14,7 @@ namespace YoutubeDownloader
     {
         private YoutubeClient youtube = new YoutubeClient();
 
-        public async Task DownloadVideo(string videoUrl)
+        public async Task DownloadVideo(string videoUrl, ProgressBar progreso)
         {
             var video = await youtube.Videos.GetAsync(videoUrl);
             var streamManifest = await youtube.Videos.Streams.GetManifestAsync(videoUrl);
@@ -31,10 +31,13 @@ namespace YoutubeDownloader
                 Directory.CreateDirectory(outputFolderAutor);
             }
             var outputPath = Path.Combine(outputFolderAutor, $"{video.Title}.mp4");
-            await youtube.Videos.Streams.DownloadAsync(streamInfo, outputPath);
-            Console.WriteLine($"Video descargado en: {outputPath}");
+            var progressHandler = new Progress<double>(progress =>
+            {
+                progreso.Value = (int)(progress * 100);
+            });
+            await youtube.Videos.Streams.DownloadAsync(streamInfo, outputPath, progressHandler);
         }
-        public async Task DownloadAudio(string videoUrl)
+        public async Task DownloadAudio(string videoUrl, ProgressBar progreso )
         { 
             var video = await youtube.Videos.GetAsync(videoUrl);
             var streamManifest = await youtube.Videos.Streams.GetManifestAsync(videoUrl);
@@ -45,16 +48,21 @@ namespace YoutubeDownloader
             {
                 Directory.CreateDirectory(outputFolderAutor);
             }
-            var outputPath = Path.Combine(outputFolderAutor, $"{video.Title}.mp3");
-            await youtube.Videos.Streams.DownloadAsync(streamInfo, outputPath);
+            var outputPath = Path.Combine(outputFolderAutor, $"{video.Title}.{streamInfo.Container}");
+
+            var progressHandler = new Progress<double>(progress =>
+            {
+                progreso.Value = (int)(progress * 100);
+            });
+            await youtube.Videos.Streams.DownloadAsync(streamInfo, outputPath, progressHandler);
 
             Console.WriteLine($"Video descargado en: {outputPath}");
         }
-        public async Task DowloadPlaylist(string playlisturl)
+        public async Task DowloadPlaylist(string playlisturl, ProgressBar progreso)
         {
            await foreach(var videos in youtube.Playlists.GetVideosAsync(playlisturl))
             {
-                await DownloadAudio(videos.Url);
+                await DownloadAudio(videos.Url, progreso);
             }
         }
     }
