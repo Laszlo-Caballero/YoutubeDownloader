@@ -20,7 +20,7 @@ namespace YoutubeDownloader
             }
         }
 
-        private async void btnDownload_Click(object sender, EventArgs e)
+        private void btnDownload_Click(object sender, EventArgs e)
         {
             string link = txtLink.Text;
             txtLink.Text = "";
