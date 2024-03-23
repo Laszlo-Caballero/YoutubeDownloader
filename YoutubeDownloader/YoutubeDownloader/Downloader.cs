@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using YoutubeDownloader.ffmpeg;
+using YoutubeDownloader.ConvertirMp3;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 
@@ -14,13 +14,12 @@ namespace YoutubeDownloader.YoutubeDownloader
     {
         private YoutubeClient youtube = new YoutubeClient();
         private Convertir convertir = new Convertir();
-
+        private Corregir corregir = new Corregir();
         public async Task DownloadVideo(string videoUrl, ProgressBar progreso)
         {
             var video = await youtube.Videos.GetAsync(videoUrl);
             var streamManifest = await youtube.Videos.Streams.GetManifestAsync(videoUrl);
             var streamInfo = streamManifest.GetVideoOnlyStreams().Where(s => s.Container == Container.Mp4).GetWithHighestVideoQuality();
-            Console.WriteLine(streamInfo);
             var outputFolder = Path.Combine(Directory.GetCurrentDirectory(), "YoutubeDownloads");
             if (!Directory.Exists(outputFolder))
             {
@@ -31,12 +30,14 @@ namespace YoutubeDownloader.YoutubeDownloader
             {
                 Directory.CreateDirectory(outputFolderAutor);
             }
-            var outputPath = Path.Combine(outputFolderAutor, $"{video.Title}.mp4");
+            string title = corregir.TituloCorregido(video.Title);
+            string outputVideo = Path.Combine(outputFolderAutor, $"{title}-NoAudio.mp4");
+
             var progressHandler = new Progress<double>(progress =>
             {
                 progreso.Value = (int)(progress * 100);
             });
-            await youtube.Videos.Streams.DownloadAsync(streamInfo, outputPath, progressHandler);
+            await youtube.Videos.Streams.DownloadAsync(streamInfo, outputVideo, progressHandler);
         }
         public async Task DownloadAudio(string videoUrl, ProgressBar progreso)
         {
@@ -49,8 +50,9 @@ namespace YoutubeDownloader.YoutubeDownloader
             {
                 Directory.CreateDirectory(outputFolderAutor);
             }
-            string outputPathDownload = Path.Combine(outputFolderAutor, $"{video.Title}.{streamInfo.Container}");
-            string outputPath = Path.Combine(outputFolderAutor, $"{video.Title}.mp3");
+            string title = corregir.TituloCorregido(video.Title);
+            string outputPathDownload = Path.Combine(outputFolderAutor, $"{title}.{streamInfo.Container}");
+            string outputPath = Path.Combine(outputFolderAutor, $"{title}.mp3");
 
             var progressHandler = new Progress<double>(progress =>
             {

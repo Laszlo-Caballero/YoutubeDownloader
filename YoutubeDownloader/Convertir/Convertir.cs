@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using NAudio.Lame;
 using NAudio.Wave;
+using System.Media;
 
-namespace YoutubeDownloader.ffmpeg
+namespace YoutubeDownloader.ConvertirMp3
 {
     internal class Convertir
     {
@@ -14,9 +16,9 @@ namespace YoutubeDownloader.ffmpeg
         {
             try
             {
-                using(var reader = new AudioFileReader(inputfile))
+                using(AudioFileReader reader = new AudioFileReader(inputfile))
                 {
-                     using (var writer = new LameMP3FileWriter(outputfile, reader.WaveFormat, LAMEPreset.VBR_50))
+                     using (LameMP3FileWriter writer = new LameMP3FileWriter(outputfile, reader.WaveFormat, LAMEPreset.VBR_50))
                     {
                         reader.CopyTo(writer);
                     }
