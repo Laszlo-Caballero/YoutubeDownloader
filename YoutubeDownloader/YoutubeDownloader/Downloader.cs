@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using YoutubeDownloader.ffmpeg;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 
@@ -12,6 +13,7 @@ namespace YoutubeDownloader.YoutubeDownloader
     internal class Downloader
     {
         private YoutubeClient youtube = new YoutubeClient();
+        private Convertir convertir = new Convertir();
 
         public async Task DownloadVideo(string videoUrl, ProgressBar progreso)
         {
@@ -47,15 +49,16 @@ namespace YoutubeDownloader.YoutubeDownloader
             {
                 Directory.CreateDirectory(outputFolderAutor);
             }
-            var outputPath = Path.Combine(outputFolderAutor, $"{video.Title}.{streamInfo.Container}");
+            string outputPathDownload = Path.Combine(outputFolderAutor, $"{video.Title}.{streamInfo.Container}");
+            string outputPath = Path.Combine(outputFolderAutor, $"{video.Title}.mp3");
 
             var progressHandler = new Progress<double>(progress =>
             {
                 progreso.Value = (int)(progress * 100);
             });
-            await youtube.Videos.Streams.DownloadAsync(streamInfo, outputPath, progressHandler);
-
-            Console.WriteLine($"Video descargado en: {outputPath}");
+            await youtube.Videos.Streams.DownloadAsync(streamInfo, outputPathDownload, progressHandler);
+            convertir.ConvertToMp3(outputPathDownload, outputPath);
+            File.Delete(outputPathDownload);
         }
         public async Task DowloadPlaylist(string playlisturl, ProgressBar progreso)
         {
